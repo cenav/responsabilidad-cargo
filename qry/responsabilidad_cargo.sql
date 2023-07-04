@@ -1,5 +1,10 @@
 -- rsc
-select r.id_cargo, p.desc_cargo, p.c_codigo, p.desc_encargado, p.nombre, p.turno
+select r.id_cargo, p.desc_cargo, p.c_codigo, p.nombre, p.c_encargado, p.desc_encargado, p.turno
+     , case p.turno
+         when 1 then 'DIA'
+         when 2 then 'TARDE'
+         when 3 then 'NOCHE'
+       end as dsc_turno
      , case p.turno
          when 1 then r.bono_dia
          when 2 then r.bono_tarde
@@ -14,6 +19,28 @@ select r.id_cargo, p.desc_cargo, p.c_codigo, p.desc_encargado, p.nombre, p.turno
    )
  order by desc_cargo, desc_encargado, nombre;
 
-select * from responsabilidad_cargo order by id_cargo;
+-- tabla rsc
+select r.id_cargo, c.descripcion as dsc_cargo, r.bono_dia, r.bono_tarde, r.bono_noche
+  from responsabilidad_cargo r
+       join planilla10.t_cargo c on r.id_cargo = c.c_cargo
+ order by r.id_cargo;
 
-select * from planilla10.t_cargo where c_cargo = 'OM';
+select *
+  from planilla10.t_cargo
+ where c_cargo = 'CHM';
+
+select *
+  from planilla10.personal
+ where c_cargo = 'CHM';
+
+select *
+  from planilla10.personal
+ where c_codigo = 'E42917';
+
+select * from estado_proceso;
+
+select * from proceso_rsc;
+
+select * from estado_proceso;
+
+select * from moneda;
