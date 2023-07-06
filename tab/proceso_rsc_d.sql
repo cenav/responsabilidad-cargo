@@ -18,7 +18,7 @@ create table pevisa.proceso_rsc_d (
 
 
 create unique index pevisa.idx_proceso_rsc_d
-  on pevisa.proceso_rsc_d(id_proceso)
+  on pevisa.proceso_rsc_d(id_proceso, id_item)
   tablespace pevisax;
 
 
@@ -28,7 +28,7 @@ create or replace public synonym proceso_rsc_d for pevisa.proceso_rsc_d;
 alter table pevisa.proceso_rsc_d
   add (
     constraint pk_proceso_rsc_d
-      primary key (id_proceso)
+      primary key (id_proceso, id_item)
         using index pevisa.idx_proceso_rsc_d
         enable validate,
     constraint fk_proceso_rsc_d

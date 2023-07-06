@@ -41,6 +41,11 @@ select * from estado_proceso;
 
 select * from proceso_rsc;
 
-select * from estado_proceso;
+select * from proceso_rsc_d;
 
-select * from moneda;
+select * from dba_indexes where table_name = 'PROCESO_RSC';
+
+select * from dba_constraints where table_name = 'PROCESO_RSC';
+
+select * from factpag;
+

@@ -11,7 +11,7 @@ create or replace package body rsc as
   ----------  -------------------  -----------------------------------------------------------------
 
   *************************************************************************************************/
-  g_item number(3) := 1;
+  g_item simple_integer := 1;
 
   cursor empleados_cr is
     select r.id_cargo, p.desc_cargo, p.c_codigo, p.nombre, p.c_encargado, p.desc_encargado, p.turno
@@ -36,8 +36,8 @@ create or replace package body rsc as
 
 
   function calc_proceso(
-    p_ano pls_integer
-  , p_mes pls_integer
+    p_ano simple_integer
+  , p_mes simple_integer
   ) return proceso_rsc%rowtype is
     l_proceso proceso_rsc%rowtype;
   begin
@@ -70,6 +70,7 @@ create or replace package body rsc as
     l_detalle.dsc_turno := p_empleado.dsc_turno;
     l_detalle.bono_bruto := p_empleado.bono;
     l_detalle.bono_neto := p_empleado.bono;
+    api_proceso_rsc_d.ins(l_detalle);
     g_item := g_item + 1;
   end;
 
@@ -83,9 +84,9 @@ create or replace package body rsc as
   end;
 
 
-  procedure procesa_bono(
-    p_ano pls_integer
-  , p_mes pls_integer
+  procedure procesa(
+    p_ano simple_integer
+  , p_mes simple_integer
   ) is
     l_proceso proceso_rsc%rowtype;
   begin
@@ -103,5 +104,13 @@ create or replace package body rsc as
 
       rollback;
       raise;
+  end;
+
+  procedure elimina(
+    p_ano simple_integer
+  , p_mes simple_integer
+  ) is
+  begin
+    delete from proceso_rsc where periodo_ano = p_ano and periodo_mes = p_mes;
   end;
 end rsc;

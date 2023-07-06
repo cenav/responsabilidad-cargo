@@ -1,6 +1,11 @@
 create or replace package rsc as
-  procedure procesa_bono(
-    p_ano pls_integer
-  , p_mes pls_integer
+  procedure procesa(
+    p_ano simple_integer
+  , p_mes simple_integer
+  );
+
+  procedure elimina(
+    p_ano simple_integer
+  , p_mes simple_integer
   );
 end rsc;
