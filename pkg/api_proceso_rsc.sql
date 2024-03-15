@@ -33,6 +33,12 @@ create or replace package pevisa.api_proceso_rsc is
   ) return boolean;
 
   function next_key return proceso_rsc.id_proceso%type result_cache;
+
+  function existe_periodo(
+    p_ano in proceso_rsc.periodo_ano%type
+  , p_mes in proceso_rsc.periodo_mes%type
+  ) return boolean;
+
 end api_proceso_rsc;
 
 
@@ -152,6 +158,21 @@ create or replace package body pevisa.api_proceso_rsc is
       from proceso_rsc;
 
     return l_nro + 1;
+  end;
+
+  function existe_periodo(
+    p_ano in proceso_rsc.periodo_ano%type
+  , p_mes in proceso_rsc.periodo_mes%type
+  ) return boolean is
+    l_count simple_integer := 0;
+  begin
+    select count(*)
+      into l_count
+      from proceso_rsc
+     where periodo_ano = p_ano
+       and periodo_mes = p_mes;
+
+    return l_count > 0;
   end;
 
 end api_proceso_rsc;

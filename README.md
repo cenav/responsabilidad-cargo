@@ -4,7 +4,7 @@ Bonos segun el riesgo del puesto que ocupa el trabajador
 
 ### Tabla de bonos
 
-![alt text](/img/bonos_rsc.png "Title")
+![alt text](/docs/img/bonos_rsc.png "Title")
 
 ### Exclusiones
 

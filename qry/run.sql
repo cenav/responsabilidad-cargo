@@ -1,4 +1,9 @@
 begin
-  rsc.procesa_bono(2023, 6);
+  rsc.elimina(2024, 1);
+  commit;
+end;
+
+begin
+  rsc.procesa(2024, 1);
   commit;
 end;
