@@ -235,7 +235,7 @@ select c_cargo, descripcion
    and nvl(status, '0') != '9'
  order by c_cargo;
 
-select * from bono;
+select * from bono order by id_bono;
 
 select * from bono_obrero_excluye_modulo;
 
@@ -246,3 +246,50 @@ select id_personal
    and periodo_mes = 1
    and id_personal = 'E4923'
    and id_bono = 2;
+
+-- envío de correo
+  with excluye as (
+    select e.id_proceso, e.id_empleado, sum(exclusion) as es_excluido
+      from proceso_rsc_excluye e
+     group by e.id_proceso, e.id_empleado
+    )
+select d.id_proceso, d.id_empleado, nom_empleado, id_cargo, dsc_cargo, id_encargado
+     , nom_encargado, id_turno, dsc_turno, bono_bruto, bono_neto
+     , case
+         when es_excluido >= 1 then 'SI'
+         when es_excluido = 0 then 'NO'
+       end as exclusion
+  from proceso_rsc p
+       join proceso_rsc_d d on p.id_proceso = d.id_proceso
+       left join excluye e on d.id_proceso = e.id_proceso and d.id_empleado = e.id_empleado
+ where p.periodo_ano = 2024
+   and p.periodo_mes = 2
+   and d.id_encargado = '056'
+ order by d.nom_encargado, d.nom_empleado;
+
+-- agrupado
+select nom_encargado
+  from proceso_rsc p
+       join proceso_rsc_d d on p.id_proceso = d.id_proceso
+ where p.id_proceso = d.id_proceso
+   and p.periodo_ano = 2024
+   and p.periodo_mes = 2
+ group by nom_encargado;
+
+select d.id_proceso, id_encargado, nom_encargado, e.ecorreo
+  from proceso_rsc p
+       join proceso_rsc_d d on p.id_proceso = d.id_proceso
+       join planilla10.tar_encarga e on d.id_encargado = e.codigo
+ where p.id_proceso = d.id_proceso
+   and p.periodo_ano = 2024
+   and p.periodo_mes = 2
+ group by id_encargado, nom_encargado, d.id_proceso, e.ecorreo
+ order by nom_encargado;
+
+select extract(month from add_months(sysdate, -1)) from dual;
+
+select extract(year from add_months(to_date('18/01/2024', 'dd/mm/yyyy'), -1)) from dual;
+
+select extract(month from sysdate) from dual;
+
+select * from planilla10.tar_encarga;

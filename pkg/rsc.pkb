@@ -182,6 +182,42 @@ create or replace package body rsc as
        where id_proceso = p_proceso.id_proceso;
   end;
 
+  procedure enviar(
+    p_periodo_ano    simple_integer
+  , p_periodo_mes    simple_integer
+  , p_encargado_id   varchar2
+  , p_encargado_nom  varchar2
+  , p_encargado_mail varchar2
+  ) is
+    l_html clob;
+    l_vars teplsql.t_assoc_array;
+  begin
+    l_html := rsc_tmpl.html_proceso();
+
+    l_vars('ano') := p_periodo_ano;
+    l_vars('mes') := p_periodo_mes;
+    l_vars('encargado_id') := p_encargado_id;
+    l_vars('encargado_nom') := p_encargado_nom;
+    l_vars('usuario') := user;
+
+    l_html := teplsql.render(l_vars, l_html);
+
+    mail.send_html(
+        p_to => p_encargado_mail || '; icatalan@pevisa.com.pe',
+        p_cc => 'jcabezas@pevisa.com.pe',
+        p_bcc => 'cnavarro@pevisa.com.pe',
+        p_from => 'avisos_bienestar@pevisa.com.pe',
+        p_subject => 'BONO RSC ' || p_periodo_ano || ' - ' || p_periodo_mes,
+        p_html_msg => l_html
+    );
+
+    --     mail.send_html(
+--         p_to => 'cnavarro@pevisa.com.pe',
+--         p_from => 'avisos_bienestar@pevisa.com.pe',
+--         p_subject => 'BONO RSC ' || p_periodo_ano || ' - ' || p_periodo_mes,
+--         p_html_msg => l_html
+--     );
+  end;
 
 --::::::::::::::::::::::::::::--
 --      Public Routines       --
@@ -232,5 +268,41 @@ create or replace package body rsc as
        set id_estado = enum_estado_proceso.cerrado
      where id_proceso = p_id_proceso;
   end cierra;
+
+  procedure correo(
+    p_ano simple_integer
+  , p_mes simple_integer
+  ) is
+  begin
+    for r in (
+      select d.id_proceso, id_encargado, nom_encargado, e.ecorreo
+        from proceso_rsc p
+             join proceso_rsc_d d on p.id_proceso = d.id_proceso
+             join planilla10.tar_encarga e on d.id_encargado = e.codigo
+       where p.id_proceso = d.id_proceso
+         and p.periodo_ano = p_ano
+         and p.periodo_mes = p_mes
+       group by id_encargado, nom_encargado, d.id_proceso, e.ecorreo
+       order by nom_encargado
+      )
+    loop
+      enviar(
+          p_periodo_ano => p_ano
+        , p_periodo_mes => p_mes
+        , p_encargado_id => r.id_encargado
+        , p_encargado_nom => r.nom_encargado
+        , p_encargado_mail => r.ecorreo
+      );
+    end loop;
+  end;
+
+  procedure tarea(
+    p_ano simple_integer default extract(year from add_months(sysdate, -1))
+  , p_mes simple_integer default extract(month from add_months(sysdate, -1))
+  ) is
+  begin
+    rsc.procesa(p_ano, p_mes);
+    commit;
+  end;
 
 end rsc;
